@@ -547,7 +547,7 @@ def selection_sort_run():
 
     from select_sort import selection_sort
     sorted_array, steps = selection_sort(array)
-    return jsonify({"sorted_array": sorted_array, "steps": ste
+    return jsonify({"sorted_array": sorted_array, "steps": steps})
 
 @app.route('/quick_sort', methods=['GET', 'POST'])
 def quick_sort():
@@ -589,6 +589,7 @@ def big_o():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
+
 
 
 
