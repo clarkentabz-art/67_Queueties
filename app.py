@@ -9,6 +9,7 @@ from graph import build_graph, bfs_sp, calculate_fare, compute_travel_time
 from quick_sort import quicksort
 from bubble_sort import bubblesort
 from insertion_sort import insertion_sort as insertion_sort_func
+from select_sort import selection_sort
 
 app = Flask(__name__)
 
@@ -537,6 +538,17 @@ def merge_sort():
 def select_sort():
     return render_template('select_sort.html')
 
+@app.route('/selection_sort_run', methods=['POST'])
+def selection_sort_run():
+    data = request.get_json()
+    array = data.get('array')
+    if not array:
+        return jsonify({"error": "No numbers provided"}), 400
+
+    from select_sort import selection_sort
+    sorted_array, steps = selection_sort(array)
+    return jsonify({"sorted_array": sorted_array, "steps": ste
+
 @app.route('/quick_sort', methods=['GET', 'POST'])
 def quick_sort():
     sorted_nums = None
@@ -577,6 +589,7 @@ def big_o():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
+
 
 
 
