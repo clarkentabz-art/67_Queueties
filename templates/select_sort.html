@@ -1,1 +1,195 @@
 {% extends "base.html" %}
+{% block content %}
+
+<section style="
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:30px;
+    margin-top:50px;
+">
+
+    <div style="
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 30px 40px;
+        max-width: 700px;
+        width: 90%;
+        color: #000;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        text-align:center;
+    ">
+        <h2>Selection Sort Algorithm</h2>
+
+        <p style="text-align: justify;">
+            Selection sort is a sorting algorithm that uses comparison between the values to find the smallest 
+            element in an unsorted portion of the list.
+            <br><br>
+            It works by finding the minimum element in the list and swapping it with the first unsorted element. 
+            This whole process continues until the whole list is sorted from the smallest to the biggest value.
+            <br><br>
+            Below is a visualisation and explanation of how selection sort works.
+            <br><br>
+
+        </p>
+
+        <input id="numbersInput"
+               placeholder="64,25,12,22,11"
+               style="width:70%;
+                      padding:8px;
+                      border-radius: 8px;
+                      border: 3ch solid rgba(255, 255, 255, 0.1);
+                      background: rgba(255, 255, 255, 0.1);
+                      backdrop-filter: blur(6px);
+                      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                      color: black;
+                      outline: none;">
+        <br><br>
+        <button onclick="start()" style="padding:8px 16px;
+                                         background: rgba(255,255,255,0.4);
+                                         border: 3ch solid rgba(255, 255, 255, 0.1);
+                                         box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+                                         border-radius: 30px;
+                                         cursor: pointer;
+                                         transition: .3s ease;">
+            Start Sorting
+        </button>
+    </div>
+
+    <div id="explanation" style="
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 25px;
+        max-width: 900px;
+        width: 95%;
+        color: #000;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        text-align:center;
+        min-height:220px;
+    ">
+        <h3>Explanation</h3>
+        <p id="explanationText">
+            Enter numbers and press Start to begin.
+        </p>
+
+        <div id="container"
+             style="
+                display:flex;
+                justify-content:center;
+                gap:12px;
+                margin-top:20px;
+                flex-wrap:wrap;
+             ">
+        </div>
+    </div>
+
+</section>
+
+<style>
+.box {
+    width: 55px;
+    height: 55px;
+    background: teal;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background 0.5s, transform 0.3s;
+}
+
+.box.min {
+    background: orange;
+}
+
+.box.swap {
+    background: red;
+    transform: scale(1.1);
+}
+</style>
+
+<script>
+let boxes = [];
+const animationSpeed = 800;
+
+function drawBoxes(array) {
+    const container = document.getElementById("container");
+    container.innerHTML = "";
+    boxes = [];
+
+    array.forEach(value => {
+        const box = document.createElement("div");
+        box.className = "box";
+        box.textContent = value;
+        container.appendChild(box);
+        boxes.push(box);
+    });
+}
+
+async function start() {
+    const input = document.getElementById("numbersInput").value;
+    if (!input) {
+        alert("Please enter numbers separated by commas");
+        return;
+    }
+
+    const array = input.split(",").map(Number);
+    drawBoxes(array);
+
+    const explanationText = document.getElementById("explanationText");
+    explanationText.textContent = "Sorting started...";
+
+    for (let i = 0; i < array.length; i++) {
+        let minIndex = i;
+        boxes[minIndex].classList.add("min");
+        explanationText.textContent =
+            `Step ${i + 1}: Assume ${array[minIndex]} is the minimum.`;
+        await sleep();
+
+        for (let j = i + 1; j < array.length; j++) {
+            if (array[j] < array[minIndex]) {
+                boxes[minIndex].classList.remove("min");
+                minIndex = j;
+                boxes[minIndex].classList.add("min");
+
+                explanationText.textContent =
+                    `New minimum found: ${array[minIndex]}`;
+                await sleep();
+            }
+        }
+
+        if (minIndex !== i) {
+            boxes[i].classList.add("swap");
+            boxes[minIndex].classList.add("swap");
+
+            explanationText.textContent =
+                `Swapping ${array[i]} and ${array[minIndex]}`;
+            await sleep();
+
+            [array[i], array[minIndex]] = [array[minIndex], array[i]];
+
+            boxes[i].textContent = array[i];
+            boxes[minIndex].textContent = array[minIndex];
+
+            boxes[i].classList.remove("swap");
+            boxes[minIndex].classList.remove("swap");
+        }
+
+        boxes[i].classList.remove("min");
+        boxes[i].style.background = "#2ecc71"; 
+    }
+
+    explanationText.innerHTML = "<b>Sorting completed successfully!</b>";
+}
+
+function sleep() {
+    return new Promise(resolve => setTimeout(resolve, animationSpeed));
+}
+</script>
+
+{% endblock %}
