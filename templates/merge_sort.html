@@ -1,1 +1,285 @@
 {% extends "base.html" %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Merge Sort Visualisation
+    </title>
+</head>
+
+<header>
+    <h2> Merge Sort Visualizer</h2>
+    <nav>
+        <div class="row navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class=" navbar-brand nav-link col gap-2 d-sm-flex" id="newArray">
+                <button type="button" class="merge-button btn btn-toolbar btn-outline-success btn-light btn-group btn-sm newArray">New Array</button>
+            </div>
+            <div class="col" id="input">
+                <span id="size">Size
+                    <input id="arr_sz" type="range" min="5" max="100" step=1 value=60>
+                </span>
+                <span id="speed">Speed
+                    <input id="speed_input" type="range" min="20" max="300" stepDown=10 value=60>
+                </span>
+            </div>
+            <div class="collapse navbar-collapse  col gap-2 ms-auto justify-content-end" id="navbarNav">
+                <button type="button" class="merge-button btn btn-outline-info btn-light btn-sm mergeSort">Start Sort</button>
+            </div>
+        </div>
+    </nav>
+    </div>
+</header>
+
+<body>
+
+    <div id="bars" class="flex-container bg-gradient border-2"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+    <script>
+        // swap function util for sorting algorithms takes input of 2 DOM elements with .style.height feature
+        function swap(el1, el2) {
+            console.log('In swap()');
+
+            let temp = el1.style.height;
+            el1.style.height = el2.style.height;
+            el2.style.height = temp;
+
+        }
+
+        // Disables sorting buttons used in conjunction with enable, so that we can disable during sorting and enable buttons after it
+        function disableSortingBtn() {
+            document.querySelector(".mergeSort").disabled = true;
+        }
+
+        // Enables sorting buttons used in conjunction with disable
+        function enableSortingBtn() {
+            document.querySelector(".mergeSort").disabled = false;
+        }
+
+        // Disables size slider used in conjunction with enable, so that we can disable during sorting and enable buttons after it
+        function disableSizeSlider() {
+            document.querySelector("#arr_sz").disabled = true;
+        }
+
+        // Enables size slider used in conjunction with disable
+        function enableSizeSlider() {
+            document.querySelector("#arr_sz").disabled = false;
+        }
+
+        // Disables newArray buttons used in conjunction with enable, so that we can disable during sorting and enable buttons after it
+        function disableNewArrayBtn() {
+            document.querySelector(".newArray").disabled = true;
+        }
+
+        // Enables newArray buttons used in conjunction with disable
+        function enableNewArrayBtn() {
+            document.querySelector(".newArray").disabled = false;
+        }
+
+        // Used in async function so that we can so animations of sorting, takes input time in ms (1000 = 1s)
+        function waitforme(milisec) {
+            return new Promise(resolve => {//problem here as in merge sort we were not seeing the sort happened without deklay so we added promise
+                setTimeout(() => { resolve('') }, milisec);
+            })
+        }
+
+        // Selecting size slider from DOM
+        let arraySize = document.querySelector('#arr_sz');//component
+
+        // Event listener to update the bars on the UI
+        arraySize.addEventListener('input', function() {
+            console.log(arraySize.value, typeof(arraySize.value));
+            createNewArray(parseInt(arraySize.value));
+        });
+
+        // Default input for waitforme function (260ms)
+        let delay = 260;
+
+        // Selecting speed slider from DOM
+        let delayElement = document.querySelector('#speed_input');
+
+        // Event listener to update delay time 
+        delayElement.addEventListener('input', function() {//speed adjuster
+            console.log(delayElement.value, typeof(delayElement.value));
+            delay = 320 - parseInt(delayElement.value);
+        });
+
+        // Creating array to store randomly generated numbers
+        let array = [];
+
+        // Call to display bars right when you visit the site
+        createNewArray();
+
+        // To create new array input size of array
+        function createNewArray(noOfBars = 60) {
+            // calling helper function to delete old bars from dom
+            deleteChild();
+
+            // creating an array of random numbers 
+            array = [];
+            for (let i = 0; i < noOfBars; i++) {
+                array.push(Math.floor(Math.random() * 250) + 1);
+            }
+            console.log(array);
+
+            // select the div #bars element
+            const bars = document.querySelector("#bars");
+
+            // create multiple element div using loop and adding class 'bar col'
+            for (let i = 0; i < noOfBars; i++) {
+                const bar = document.createElement("div");
+                bar.style.height = `${array[i]*2}px`;
+                bar.classList.add('bar');
+                bar.classList.add('flex-item');
+                bar.classList.add(`barNo${i}`);
+                bars.appendChild(bar);
+            }
+        }
+
+        // Helper function to delete all the previous bars so that new can be added
+        function deleteChild() {
+            const bar = document.querySelector("#bars");
+            bar.innerHTML = '';
+        }
+
+        // Selecting newarray button from DOM and adding eventlistener
+        const newArray = document.querySelector(".newArray");
+        newArray.addEventListener("click", function() {
+            console.log("From newArray " + arraySize.value);
+            console.log("From newArray " + delay);
+            enableSortingBtn();
+            enableSizeSlider();
+            createNewArray(arraySize.value);
+        });
+    </script>
+
+    <script>
+        //let delay = 30;
+        async function merge(ele, low, mid, high){
+            console.log('In merge()');
+            console.log(`low=${low}, mid=${mid}, high=${high}`);
+            const n1 = mid - low + 1;
+            const n2 = high - mid;
+            console.log(`n1=${n1}, n2=${n2}`);
+            let left = new Array(n1);
+            let right = new Array(n2);
+
+            for(let i = 0; i < n1; i++){
+                await waitforme(delay);
+                console.log('In merge left loop');
+                console.log(ele[low + i].style.height + ' at ' + (low+i));
+                // color
+                ele[low + i].style.background = 'orange';
+                left[i] = ele[low + i].style.height;
+            }
+            for(let i = 0; i < n2; i++){
+                await waitforme(delay);
+                console.log('In merge right loop');
+                console.log(ele[mid + 1 + i].style.height + ' at ' + (mid+1+i));
+                // color
+                ele[mid + 1 + i].style.background = 'yellow';
+                right[i] = ele[mid + 1 + i].style.height;
+            }
+            await waitforme(delay);
+            let i = 0, j = 0, k = low;
+            while(i < n1 && j < n2){
+                await waitforme(delay);
+                console.log('In merge while loop');
+                console.log(parseInt(left[i]), parseInt(right[j]));
+                
+                // To add color for which two r being compared for merging
+                
+                if(parseInt(left[i]) <= parseInt(right[j])){
+                    console.log('In merge while loop if');
+                    // color
+                    if((n1 + n2) === ele.length){
+                        ele[k].style.background = 'green';
+                    }
+                    else{
+                        ele[k].style.background = 'lightgreen';
+                    }
+                    
+                    ele[k].style.height = left[i];
+                    i++;
+                    k++;
+                }
+                else{
+                    console.log('In merge while loop else');
+                    // color
+                    if((n1 + n2) === ele.length){
+                        ele[k].style.background = 'green';
+                    }
+                    else{
+                        ele[k].style.background = 'lightgreen';
+                    } 
+                    ele[k].style.height = right[j];
+                    j++;
+                    k++;
+                }
+            }
+            while(i < n1){
+                await waitforme(delay);
+                console.log("In while if n1 is left");
+                // color
+                if((n1 + n2) === ele.length){
+                    ele[k].style.background = 'green';
+                }
+                else{
+                    ele[k].style.background = 'lightgreen';
+                }
+                ele[k].style.height = left[i];
+                i++;
+                k++;
+            }
+            while(j < n2){
+                await waitforme(delay);
+                console.log("In while if n2 is left");
+                // color
+                if((n1 + n2) === ele.length){
+                    ele[k].style.background = 'green';
+                }
+                else{
+                    ele[k].style.background = 'lightgreen';
+                }
+                ele[k].style.height = right[j];
+                j++;
+                k++;
+            }
+        }
+
+        async function mergeSort(ele, l, r){
+            console.log('In mergeSort()');
+            if(l >= r){
+                console.log(`return cause just 1 elemment l=${l}, r=${r}`);
+                return;
+            }
+            const m = l + Math.floor((r - l) / 2);
+            console.log(`left=${l} mid=${m} right=${r}`, typeof(m));
+            await mergeSort(ele, l, m);
+            await mergeSort(ele, m + 1, r);
+            await merge(ele, l, m, r);
+        }
+
+        const mergeSortbtn = document.querySelector(".mergeSort");
+        mergeSortbtn.addEventListener('click', async function(){
+            let ele = document.querySelectorAll('.bar');
+            let l = 0;
+            let r = parseInt(ele.length) - 1;
+            disableSortingBtn();
+            disableSizeSlider();
+            disableNewArrayBtn();
+            await mergeSort(ele, l, r);
+            enableSortingBtn();
+            enableSizeSlider();
+            enableNewArrayBtn();
+        });
+    </script>
+
+</body>
+
+
+{% endblock %}

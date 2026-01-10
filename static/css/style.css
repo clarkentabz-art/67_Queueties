@@ -543,4 +543,33 @@ a:visited {
     font-weight: bold;
 }
 
+/*merge CSS*/
+.flex-container {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 50%;
+    height: 500px;
+    justify-content: center;
+    transition: 2s all ease;
+    border: 5pt solid #d7b7a3;
+    justify-self: center;
+    align-items: flex-end;
+}
 
+.flex-item {
+    background: #ffb4e8;
+    border: 1pt solid #d63384;;
+    width: 15px;
+    transition: 0.1s all ease;
+}
+.merge-button {
+    background-color: #fce4ec;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 0.4rem;
+    padding: 0.4rem;
+    border: 1px solid #d7b7a3;
+    border-radius: 8px;
+    font-size: larger;
+}
